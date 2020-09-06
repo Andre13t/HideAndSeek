@@ -7,11 +7,14 @@
 #include "HideAndSeekGameModeBase.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class HIDEANDSEEK_API AHideAndSeekGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+		
+	virtual void StartPlay() override;
+
 };
