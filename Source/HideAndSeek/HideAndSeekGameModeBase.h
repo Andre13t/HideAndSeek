@@ -17,4 +17,5 @@ class HIDEANDSEEK_API AHideAndSeekGameModeBase : public AGameModeBase
 		
 	virtual void StartPlay() override;
 
+
 };
