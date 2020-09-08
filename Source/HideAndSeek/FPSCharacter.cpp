@@ -3,7 +3,6 @@
 
 #include "FPSCharacter.h"
 #include "HideAndSeekGameModeBase.h"
-#include "GameFramework/PlayerController."
 #include "GameFramework/GameModeBase.h"
 
 // Sets default values

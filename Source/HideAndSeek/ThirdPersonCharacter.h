@@ -22,13 +22,6 @@ class HIDEANDSEEK_API AThirdPersonCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AThirdPersonCharacter();
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseTurnRate;
-
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		float BaseLookUpRate;
 
 protected:
 	// Called when the game starts or when spawned
@@ -39,6 +32,10 @@ protected:
 
 	/** Called for side to side input */
 	void MoveRight(float Value);
+	// set if the player can move the object on which he is posing
+	void CanMovesDirection();
+	// block move
+	void DontMovesDirection();
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

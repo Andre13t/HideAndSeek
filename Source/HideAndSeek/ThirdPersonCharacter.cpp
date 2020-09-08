@@ -24,7 +24,7 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
@@ -66,11 +66,16 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
+	PlayerInputComponent->BindAction("CanMoveObject", IE_Pressed, this, &AThirdPersonCharacter::CanMovesDirection);
+	PlayerInputComponent->BindAction("CanMoveObject", IE_Released, this, &AThirdPersonCharacter::DontMovesDirection);
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AThirdPersonCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AThirdPersonCharacter::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+
 }
 
 void AThirdPersonCharacter::MoveForward(float Value)
@@ -100,5 +105,36 @@ void AThirdPersonCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AThirdPersonCharacter::CanMovesDirection()
+{
+	if (GEngine)
+	{
+		// Display a debug message for five seconds. 
+		// The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Can move"));
+	}
+	//GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	
+	
+}
+
+/*FVector Arrow = GetArrowComponent()->GetComponentRotation();
+	UArrowComponent* ArrowComponent;
+	ArrowComponent = GetArrowComponent();*/
+
+
+void AThirdPersonCharacter::DontMovesDirection()
+{
+	if (GEngine)
+	{
+		// Display a debug message for five seconds. 
+		// The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Can't move"));
+	}
+	//GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 }
 
