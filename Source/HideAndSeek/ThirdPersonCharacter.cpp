@@ -8,16 +8,18 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+
+
 
 // Sets default values
 AThirdPersonCharacter::AThirdPersonCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -39,21 +41,59 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
+	
+	
 }
 
 // Called when the game starts or when spawned
 void AThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	// pegando a rotaçao do player
+	//FRotator a;
+	//ACharacter* myCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	//a = myCharacter->GetActorRotation();
+	//FString b = a.ToString();
+
+	//if (GEngine)
+	//{
+	//	// Display a debug message for five seconds. 
+	//	// The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT(" " + b));
+	//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT(" " + s));
+
+	//}
+
 }
 
 // Called every frame
 void AThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	
+	if (canMove)
+	{	
+		float teste = (PawnRotation + ((-1) * (cameraRotation - FollowCamera->GetComponentRotation().Yaw)));
+		if (GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw != teste)
+		{
+			GetCapsuleComponent()->SetWorldRotation(FRotator(0, teste, 0));
 
+			//FString TheFloatStr = FString::SanitizeFloat(GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw);
+			//if (GEngine)
+			//{
+			//	// Display a debug message for five seconds. 
+			//	// The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
+			//	//float teste = ((PawnInst + (CameraInst - FollowCamera->GetComponentRotation() * -1)).Yaw);
+			//	
+			//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Yaw: " + TheFloatStr));
+			//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT(" " + s));
+			//}
+		}	
+	}
+	
+	
 }
 
 // Called to bind functionality to input
@@ -109,32 +149,24 @@ void AThirdPersonCharacter::MoveRight(float Value)
 
 void AThirdPersonCharacter::CanMovesDirection()
 {
-	if (GEngine)
-	{
-		// Display a debug message for five seconds. 
-		// The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Can move"));
-	}
-	//GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->bUseControllerDesiredRotation = true;
-	
+
+	//GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	PawnRotation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw;
+	cameraRotation = FollowCamera->GetComponentRotation().Yaw;
+	canMove = true;
 	
 }
 
-/*FVector Arrow = GetArrowComponent()->GetComponentRotation();
-	UArrowComponent* ArrowComponent;
-	ArrowComponent = GetArrowComponent();*/
-
-
 void AThirdPersonCharacter::DontMovesDirection()
 {
-	if (GEngine)
-	{
-		// Display a debug message for five seconds. 
-		// The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Can't move"));
-	}
-	//GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	
+	//GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	canMove = false;
+}
+
+void AThirdPersonCharacter::GetWorldRotation(FRotator camera, FRotator pawn)
+{
+	
+	
 }
 
