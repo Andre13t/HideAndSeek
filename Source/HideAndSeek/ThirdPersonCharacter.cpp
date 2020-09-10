@@ -20,6 +20,7 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -50,21 +51,6 @@ void AThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// pegando a rotaçao do player
-	//FRotator a;
-	//ACharacter* myCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	//a = myCharacter->GetActorRotation();
-	//FString b = a.ToString();
-
-	//if (GEngine)
-	//{
-	//	// Display a debug message for five seconds. 
-	//	// The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT(" " + b));
-	//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT(" " + s));
-
-	//}
-
 }
 
 // Called every frame
@@ -72,28 +58,18 @@ void AThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	
+	// rotation pawn
 	if (canMove)
 	{	
+		// calculation to determine how much the spawn will rotate according to the camera
 		float teste = (PawnRotation + ((-1) * (cameraRotation - FollowCamera->GetComponentRotation().Yaw)));
+		// for avoid flic rotation
 		if (GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw != teste)
 		{
+			// set up new rotation of pawn
 			GetCapsuleComponent()->SetWorldRotation(FRotator(0, teste, 0));
-
-			//FString TheFloatStr = FString::SanitizeFloat(GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw);
-			//if (GEngine)
-			//{
-			//	// Display a debug message for five seconds. 
-			//	// The -1 "Key" value (first argument) indicates that we will never need to update or refresh this message.
-			//	//float teste = ((PawnInst + (CameraInst - FollowCamera->GetComponentRotation() * -1)).Yaw);
-			//	
-			//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Yaw: " + TheFloatStr));
-			//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, TEXT(" " + s));
-			//}
 		}	
-	}
-	
-	
+	}	
 }
 
 // Called to bind functionality to input
@@ -114,7 +90,6 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-
 
 }
 
@@ -150,9 +125,10 @@ void AThirdPersonCharacter::MoveRight(float Value)
 void AThirdPersonCharacter::CanMovesDirection()
 {
 
-	//GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	// set inicial value of camera rotation and pawn
 	PawnRotation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw;
 	cameraRotation = FollowCamera->GetComponentRotation().Yaw;
+	// set if tick can rotation pawn
 	canMove = true;
 	
 }
@@ -160,13 +136,7 @@ void AThirdPersonCharacter::CanMovesDirection()
 void AThirdPersonCharacter::DontMovesDirection()
 {
 	
-	//GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	// set if tick can rotation pawn
 	canMove = false;
-}
-
-void AThirdPersonCharacter::GetWorldRotation(FRotator camera, FRotator pawn)
-{
-	
-	
 }
 

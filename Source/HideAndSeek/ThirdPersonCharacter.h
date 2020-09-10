@@ -37,7 +37,6 @@ protected:
 	// block move
 	void DontMovesDirection();
 
-	void GetWorldRotation(FRotator camera,FRotator pawn);
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -46,18 +45,13 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	// var blcok a tick function, or can rotation pawn
 	bool canMove{ false };
-	FRotator CameraInst{};
-	FRotator PawnInst{};
+	// var controlling rotation value
 	float cameraRotation{}, PawnRotation{};
-	// Called to bind functionality to input
-	/*UFUNCTION(BlueprintCallable, Category = "Actor", meta = (ComponentClass = "ActorComponent"), meta = (DeterminesOutputType = "ComponentClass"))
-		TArray<UActorComponent*> GetComponentsByTag(TSubclassOf<UActorComponent> ComponentClass, FName Tag) const;*/
 		
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
 };
