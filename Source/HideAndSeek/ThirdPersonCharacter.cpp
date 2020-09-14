@@ -10,17 +10,15 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-
-
 // Sets default values
 AThirdPersonCharacter::AThirdPersonCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	
+
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -37,13 +35,11 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 600.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-	
+
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	
-	
+	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
 }
 
 // Called when the game starts or when spawned
@@ -57,19 +53,12 @@ void AThirdPersonCharacter::BeginPlay()
 void AThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	// rotation pawn
 	if (canMove)
-	{	
-		// calculation to determine how much the spawn will rotate according to the camera
-		float teste = (PawnRotation + ((-1) * (cameraRotation - FollowCamera->GetComponentRotation().Yaw)));
-		// for avoid flic rotation
-		if (GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw != teste)
-		{
-			// set up new rotation of pawn
-			GetCapsuleComponent()->SetWorldRotation(FRotator(0, teste, 0));
-		}	
-	}	
+	{
+		RotationPawn(DeltaTime);
+	}
 }
 
 // Called to bind functionality to input
@@ -114,9 +103,10 @@ void AThirdPersonCharacter::MoveRight(float Value)
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
+		
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
@@ -124,19 +114,31 @@ void AThirdPersonCharacter::MoveRight(float Value)
 
 void AThirdPersonCharacter::CanMovesDirection()
 {
-
 	// set inicial value of camera rotation and pawn
 	PawnRotation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw;
 	cameraRotation = FollowCamera->GetComponentRotation().Yaw;
 	// set if tick can rotation pawn
 	canMove = true;
-	
 }
 
 void AThirdPersonCharacter::DontMovesDirection()
 {
-	
-	// set if tick can rotation pawn
-	canMove = false;
+	canMove = false;// set if tick can rotation pawn
+}
+
+void AThirdPersonCharacter::RotationPawn(float DeltaTime)
+{
+	// calculation to determine how much the spawn will rotate according to the camera
+	float GetAddYawValue = (PawnRotation + ((-1) * (cameraRotation - FollowCamera->GetComponentRotation().Yaw)));
+	// using delta time on value to keep same value independent of frame hate
+	GetAddYawValue += GetAddYawValue * DeltaTime;
+	GetCapsuleComponent()->SetWorldRotation(FRotator(0, GetAddYawValue, 0));
+
+	// for avoid flic rotation whe the value is equal
+	//if (GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw != GetAddYawValue)
+	//{
+	//	// set up new rotation of pawn
+	//	GetCapsuleComponent()->SetWorldRotation(FRotator(0, GetAddYawValue,0));
+	//}
 }
 

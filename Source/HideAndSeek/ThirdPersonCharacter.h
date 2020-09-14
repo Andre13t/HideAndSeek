@@ -37,6 +37,8 @@ protected:
 	// block move
 	void DontMovesDirection();
 
+	
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -45,9 +47,12 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	// var blcok a tick function, or can rotation pawn
+	
+	UPROPERTY(EditAnywhere)// bool var blcok a tick function "RotationPawn()", this function can rotation pawn(test UPROPERTY)
 	bool canMove{ false };
-	// var controlling rotation value
+	
+	void RotationPawn(float DeltaTime);
+// var controlling rotation value
 	float cameraRotation{}, PawnRotation{};
 		
 	/** Returns CameraBoom subobject **/

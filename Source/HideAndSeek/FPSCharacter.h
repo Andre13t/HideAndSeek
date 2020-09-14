@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "FPSCharacter.generated.h"
 
+
 UCLASS()
 class HIDEANDSEEK_API AFPSCharacter : public ACharacter
 {
@@ -41,8 +42,19 @@ public:
 	// Clears jump flag when key is released.
 	UFUNCTION()
 		void StopJump();
-	// create camera
+	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
 		class UCameraComponent* FPSCameraComponent;
 
+	// Function that handles firing projectiles.
+	UFUNCTION()
+		void Fire();
+	// Gun muzzle's offset from the camera location.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		FVector MuzzleOffset;
+	// Projectile class to spawn.
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AFPSProjectile> ProjectileClass;
+
 };
+

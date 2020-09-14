@@ -2,10 +2,9 @@ Binaries
 DerivedDataCache
 Intermediate
 Saved
-Content\PolygonCity
-Content\Retro_8Bit_Sounds
-Content\AnimStarterPack
-Content\StarterContent
+Content/PolygonCity
+Content/Retro_8Bit_Sounds
+Content/StarterContent
 .vscode
 .vs
 *.VC.db
