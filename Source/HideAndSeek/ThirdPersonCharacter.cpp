@@ -9,6 +9,10 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+//#include "Components/StaticMeshComponent.h"
+//#include "Engine/StaticMesh.h"
+//#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 AThirdPersonCharacter::AThirdPersonCharacter()
@@ -33,31 +37,54 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 600.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 500.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
+
+	// create mesh
+	MeshToChanged = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshToChanged"));
+	MeshToChanged->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>MeshAsset(TEXT("StaticMesh'/Game/Props/SM_Prop_Hydrant_01.SM_Prop_Hydrant_01'"));
+	Asset = MeshAsset.Object;
 }
 
 // Called when the game starts or when spawned
 void AThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
 
+	
+	//Asset->GetName();
+	MeshToChanged->SetStaticMesh(Asset);
+	/*if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Cyan, FString::Printf(TEXT("Component name: %s"),
+			Asset->GetName()));
+	}*/
+	
 }
 
 // Called every frame
 void AThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (canGetStatickMesh)
+	{
+		
+
+	}
+	
 
 	// rotation pawn
 	if (canMove)
 	{
-		RotationPawn(DeltaTime);
+		int32 a = 2;
+		RotationPawn(DeltaTime,a);
 	}
 }
 
@@ -80,6 +107,9 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
+	// set up "switch the body"
+	PlayerInputComponent->BindAction("SwitchTheBody", IE_Pressed, this, &AThirdPersonCharacter::CanGetTheStatcMeshView);
+	PlayerInputComponent->BindAction("SwitchTheBody", IE_Released, this, &AThirdPersonCharacter::DontGetTheStatcMeshView);
 }
 
 void AThirdPersonCharacter::MoveForward(float Value)
@@ -126,19 +156,57 @@ void AThirdPersonCharacter::DontMovesDirection()
 	canMove = false;// set if tick can rotation pawn
 }
 
-void AThirdPersonCharacter::RotationPawn(float DeltaTime)
+void AThirdPersonCharacter::RotationPawn(float DeltaTime, int32& asd)
 {
 	// calculation to determine how much the spawn will rotate according to the camera
 	float GetAddYawValue = (PawnRotation + ((-1) * (cameraRotation - FollowCamera->GetComponentRotation().Yaw)));
 	// using delta time on value to keep same value independent of frame hate
-	GetAddYawValue += GetAddYawValue * DeltaTime;
-	GetCapsuleComponent()->SetWorldRotation(FRotator(0, GetAddYawValue, 0));
-
+	
+	//GetCapsuleComponent()->SetWorldRotation(FRotator(0, GetAddYawValue, 0));
+	asd = 10;
 	// for avoid flic rotation whe the value is equal
-	//if (GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorRotation().Yaw != GetAddYawValue)
-	//{
-	//	// set up new rotation of pawn
-	//	GetCapsuleComponent()->SetWorldRotation(FRotator(0, GetAddYawValue,0));
-	//}
+	if (PawnRotation != GetAddYawValue)
+	{
+		GetAddYawValue -= GetAddYawValue * DeltaTime;
+		// set up new rotation of pawn
+		GetCapsuleComponent()->SetWorldRotation(FRotator(0, GetAddYawValue, 0));
+	}
+}
+
+void AThirdPersonCharacter::CanGetTheStatcMeshView()
+{
+	canGetStatickMesh = true;
+
+}
+
+void AThirdPersonCharacter::DontGetTheStatcMeshView()
+{
+	canGetStatickMesh = false;
+}
+
+void AThirdPersonCharacter::LineTracer(FString& ReturnNameOfStaticMesh)
+{
+	FHitResult OutHit;
+	//FVector Start = FollowCamera->GetComponentLocation();
+	FVector Start = GetCapsuleComponent()->GetComponentLocation();
+	FVector ForwardVector = FollowCamera->GetForwardVector();
+	FVector End = (Start + (ForwardVector * 500.0f));
+
+	FCollisionQueryParams CollisionParams;
+
+	//DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
+
+	bool isHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
+	if (isHit)
+		if (OutHit.bBlockingHit)
+			if (GEngine)
+			{
+				FString porra = OutHit.GetActor()->GetName();
+				ReturnNameOfStaticMesh = porra;
+				////ReturnNameOfStaticMesh =  *OutHit.GetActor()->GetName();
+				////GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Name: %s", *OutHit.GetActor()->GetComponents())));
+				//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Name: %s"),
+				//	*OutHit.GetActor()->GetName()));
+			}
 }
 

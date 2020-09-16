@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/StaticMeshComponent.h"
 #include "ThirdPersonCharacter.generated.h"
 
 UCLASS(config = Game)
@@ -18,6 +19,11 @@ class HIDEANDSEEK_API AThirdPersonCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* MeshToChanged;
+	
+	class UStaticMesh* Asset;
 
 public:
 	// Sets default values for this character's properties
@@ -46,16 +52,31 @@ protected:
 
 public:
 	// Called every frame
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NewStatus")
+	FString ReturnName;
+	FString NameStatickMesh;
 	virtual void Tick(float DeltaTime) override;
 	
-	UPROPERTY(EditAnywhere)// bool var blcok a tick function "RotationPawn()", this function can rotation pawn(test UPROPERTY)
-	bool canMove{ false };
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NewStatus")
+	bool canGetStatickMesh{ false };
 	
-	void RotationPawn(float DeltaTime);
-// var controlling rotation value
+	void CanGetTheStatcMeshView();
+	void DontGetTheStatcMeshView();
+	
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NewStatus")// bool var blcok a tick function "RotationPawn()", this function can rotation pawn(test UPROPERTY)
+	bool canMove{ false };
+
+	
+	/* call this function in blueprint editor and Category makes a easy to find**/
+	UFUNCTION(BlueprintCallable, Category = "Rotation staticmesh")
+	void RotationPawn(float DeltaTime, int32& asd);
+	UFUNCTION(BlueprintCallable, Category = "Line Tracer Get Name")
+	void LineTracer(FString& ReturnNameOfStaticMesh);
+	// var controlling rotation value
 	float cameraRotation{}, PawnRotation{};
 		
-	/** Returns CameraBoom subobject **/
+	/** Returns CameraBoom subobject 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }

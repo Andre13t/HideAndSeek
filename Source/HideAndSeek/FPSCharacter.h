@@ -21,6 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -49,12 +50,14 @@ public:
 	// Function that handles firing projectiles.
 	UFUNCTION()
 		void Fire();
+
 	// Gun muzzle's offset from the camera location.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		FVector MuzzleOffset;
 	// Projectile class to spawn.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AFPSProjectile> ProjectileClass;
+
 
 };
 
