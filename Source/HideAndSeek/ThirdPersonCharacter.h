@@ -64,15 +64,19 @@ public:
 	void DontGetTheStatcMeshView();
 	
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NewStatus")// bool var blcok a tick function "RotationPawn()", this function can rotation pawn(test UPROPERTY)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NewStatus")// bool var blcok a tick function "RotationPawn()", this function can rotation pawn(test UPROPERTY)
 	bool canMove{ false };
 
 	
 	/* call this function in blueprint editor and Category makes a easy to find**/
 	UFUNCTION(BlueprintCallable, Category = "Rotation staticmesh")
-	void RotationPawn(float DeltaTime, int32& asd);
+	void RotationPawn(float DeltaTime);
 	UFUNCTION(BlueprintCallable, Category = "Line Tracer Get Name")
 	void LineTracer(FString& ReturnNameOfStaticMesh);
+
+	UFUNCTION(BlueprintCallable, Category = "Change Static Mesh")
+	void GhangeStatic();
+	
 	// var controlling rotation value
 	float cameraRotation{}, PawnRotation{};
 		

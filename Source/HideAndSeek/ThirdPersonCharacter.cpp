@@ -10,10 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
-//#include "Components/StaticMeshComponent.h"
-//#include "Engine/StaticMesh.h"
-//#include "UObject/ConstructorHelpers.h"
-
+#include "UObject/ConstructorHelpers.h"
 // Sets default values
 AThirdPersonCharacter::AThirdPersonCharacter()
 {
@@ -48,43 +45,31 @@ AThirdPersonCharacter::AThirdPersonCharacter()
 	// create mesh
 	MeshToChanged = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshToChanged"));
 	MeshToChanged->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>MeshAsset(TEXT("StaticMesh'/Game/Props/SM_Prop_Hydrant_01.SM_Prop_Hydrant_01'"));
-	Asset = MeshAsset.Object;
+
+	// try to change the staticmesh
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh>MeshAsset(TEXT("StaticMesh'/Game/Props/SM_Prop_Hydrant_01.SM_Prop_Hydrant_01'"));
+	//Asset = MeshAsset.Object;
 }
 
 // Called when the game starts or when spawned
 void AThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	// try to change the staticmesh
+	//MeshToChanged->SetStaticMesh(Asset);
 
-	
-	//Asset->GetName();
-	MeshToChanged->SetStaticMesh(Asset);
-	/*if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Cyan, FString::Printf(TEXT("Component name: %s"),
-			Asset->GetName()));
-	}*/
-	
 }
 
 // Called every frame
 void AThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (canGetStatickMesh)
-	{
-		
-
-	}
-	
 
 	// rotation pawn
 	if (canMove)
 	{
 		int32 a = 2;
-		RotationPawn(DeltaTime,a);
+		RotationPawn(DeltaTime);
 	}
 }
 
@@ -110,6 +95,9 @@ void AThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	// set up "switch the body"
 	PlayerInputComponent->BindAction("SwitchTheBody", IE_Pressed, this, &AThirdPersonCharacter::CanGetTheStatcMeshView);
 	PlayerInputComponent->BindAction("SwitchTheBody", IE_Released, this, &AThirdPersonCharacter::DontGetTheStatcMeshView);
+
+	// test
+	PlayerInputComponent->BindAction("F", IE_Pressed, this, &AThirdPersonCharacter::GhangeStatic);
 }
 
 void AThirdPersonCharacter::MoveForward(float Value)
@@ -133,10 +121,10 @@ void AThirdPersonCharacter::MoveRight(float Value)
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		
+
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
@@ -156,14 +144,13 @@ void AThirdPersonCharacter::DontMovesDirection()
 	canMove = false;// set if tick can rotation pawn
 }
 
-void AThirdPersonCharacter::RotationPawn(float DeltaTime, int32& asd)
+void AThirdPersonCharacter::RotationPawn(float DeltaTime)
 {
 	// calculation to determine how much the spawn will rotate according to the camera
 	float GetAddYawValue = (PawnRotation + ((-1) * (cameraRotation - FollowCamera->GetComponentRotation().Yaw)));
 	// using delta time on value to keep same value independent of frame hate
-	
+
 	//GetCapsuleComponent()->SetWorldRotation(FRotator(0, GetAddYawValue, 0));
-	asd = 10;
 	// for avoid flic rotation whe the value is equal
 	if (PawnRotation != GetAddYawValue)
 	{
@@ -198,15 +185,25 @@ void AThirdPersonCharacter::LineTracer(FString& ReturnNameOfStaticMesh)
 
 	bool isHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
 	if (isHit)
-		if (OutHit.bBlockingHit)
+		if (OutHit.bBlockingHit) {
+
+			/*FString porra = OutHit.GetActor()->GetName();
+			ReturnNameOfStaticMesh = porra;*/
+			ReturnNameOfStaticMesh = FString(OutHit.GetActor()->GetName());
 			if (GEngine)
 			{
-				FString porra = OutHit.GetActor()->GetName();
-				ReturnNameOfStaticMesh = porra;
+
 				////ReturnNameOfStaticMesh =  *OutHit.GetActor()->GetName();
 				////GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Name: %s", *OutHit.GetActor()->GetComponents())));
 				//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Name: %s"),
 				//	*OutHit.GetActor()->GetName()));
 			}
+		}
 }
 
+void  AThirdPersonCharacter::GhangeStatic()
+{
+	ConstructorHelpers::FObjectFinder<UStaticMesh>MeshAsset(TEXT("StaticMesh'/Game/Props/SM_Prop_Hydrant_01.SM_Prop_Hydrant_01'"));
+	Asset = MeshAsset.Object;
+	//MeshToChanged->SetStaticMesh(Asset);
+}

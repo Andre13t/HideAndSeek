@@ -12,17 +12,20 @@ class HIDEANDSEEK_API ATest : public AActor
 	GENERATED_BODY()
 	
 public:	
+	// add root component
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* ActorRootSceneComponent;
 	// Sets default values for this actor's properties
 	ATest();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	// create a mesh in this actor
+	//UPROPERTY(VisibleAnywhere)
+	//UStaticMeshComponent* Supermesh;
+
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* Supermesh;
+	
 };

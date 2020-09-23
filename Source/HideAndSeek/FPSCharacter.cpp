@@ -29,7 +29,9 @@ AFPSCharacter::AFPSCharacter()
 void AFPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	// disenable tick event, avoid this "PrimaryActorTick.bCanEverTick = true"
+	SetActorTickEnabled(false);
 }
 
 // Called every frame
